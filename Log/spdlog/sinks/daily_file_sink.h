@@ -67,12 +67,17 @@ public:
 protected:
     void sink_it_(const details::log_msg &msg) override
     {
-
         if (msg.time >= rotation_tp_)
         {
             file_helper_.open(FileNameCalc::calc_filename(base_filename_, now_tm(msg.time)), truncate_);
             rotation_tp_ = next_rotation_tp_();
         }
+
+        if(!file_helper_.file_exists(FileNameCalc::calc_filename(base_filename_, now_tm(msg.time))))
+        {
+            file_helper_.open(FileNameCalc::calc_filename(base_filename_, now_tm(msg.time)), truncate_);
+        }
+
         fmt::memory_buffer formatted;
         sink::formatter_->format(msg, formatted);
         file_helper_.write(formatted);

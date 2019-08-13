@@ -41,21 +41,19 @@ std::shared_ptr<spdlog::logger> SpdlogInstance::get_logger()
 SpdlogInstance::SpdlogInstance(const string &log_file_path, const uint &log_level, const uint &log_output)
 {
     std::vector<spdlog::sink_ptr> sink_list;
-    /// 标准输出
+    // 标准输出
     if(log_output == 0 || log_output == 2)
     {
         auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
         console_sink->set_level(calculate_level(log_level));
-        console_sink->set_pattern("%^[%Y-%m-%d %H:%M:%S %f][Thread: %t] %v %$");
         sink_list.push_back(console_sink);
     }
 
-    /// 文件输出
+    // 文件输出
     if(log_output == 1 || log_output == 2)
     {
         auto file_sink = std::make_shared<spdlog::sinks::daily_file_sink_st>(log_file_path, 0, 1);
         file_sink->set_level(calculate_level(log_level));
-        file_sink->set_pattern("%^[%Y-%m-%d %H:%M:%S %f][Thread: %t] %v %$");
         sink_list.push_back(file_sink);
     }
 

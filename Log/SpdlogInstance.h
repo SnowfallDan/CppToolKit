@@ -7,7 +7,7 @@
 #include "spdlog/sinks/stdout_color_sinks.h"
 
 #if defined(__linux__)
-// Linux系统
+// Linux
 #elif defined(_WIN32)
 #define uint uint32_t
 #endif
