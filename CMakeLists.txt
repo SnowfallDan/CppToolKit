@@ -22,12 +22,10 @@ elseif(MACOS)
 endif()
 include_directories("${PROJECT_BINARY_DIR}" "${PROJECT_SOURCE_DIR}/include")
 
-
 include_directories(Log)
-add_subdirectory(Log)
+include_directories(MemoryPool)
 
-add_executable(myUtils main.cpp)
-TARGET_LINK_LIBRARIES(myUtils spd_log)
+add_subdirectory(example)
 
 # Set RPATH
 if(WINDOWS)
