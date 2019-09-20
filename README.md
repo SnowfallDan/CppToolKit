@@ -1,4 +1,5 @@
 # Tools
 
 
-1. **Log**: 使用spdlog封装的C++ log模块
+1. **Log**: C++ log module encapsulated by spdlog
+2. **MemoryPool**: Memory Pool from cacay/MemoryPool
