@@ -27,8 +27,8 @@ enum LOG_LEVEL
 
 enum LOG_OUTPUT
 {
-    LOG2FILE = 0,
-    LOG2STDOUT,
+    LOG2STDOUT = 0,
+    LOG2FILE,
     BOTH,
 };
 
