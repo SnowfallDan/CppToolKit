@@ -24,6 +24,7 @@ include_directories("${PROJECT_BINARY_DIR}" "${PROJECT_SOURCE_DIR}/include")
 
 include_directories(Log)
 include_directories(MemoryPool)
+include_directories(EventPoller)
 
 add_subdirectory(example)
 
