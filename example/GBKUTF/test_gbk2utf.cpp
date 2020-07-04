@@ -2,23 +2,30 @@
 
 int main()
 {
-    string inbuf = "adf ！@#￥%……&×（）??+～中文测试！ 1234567890\nabcdefghigklmnopqrstuvwxyz\rABCDEFGHIGKLMNOPQRSTUVWXYZ"; //gbk
-    printf("--- inbuf = %s\n", inbuf.c_str());
+    string inbuf = "测试文的"; //gbk
+    printf("inbuf = %s\n", inbuf.c_str());
     string outbuf;
+    auto flag = is_str_utf8(outbuf.c_str());
+    printf("utf8 is_str_utf8 Flag = %d\n", flag);
+    flag = is_str_gbk(outbuf.c_str());
+    printf("gbk is_str_gbk Flag = %d\n", flag);
     outbuf = gbk2utf8(inbuf);  //utf8
-    printf("--- outbuf = %s\n", outbuf.c_str());
+    printf("utbuf = %s\n", outbuf.c_str());
 
-    if(outbuf.empty())
+    flag = is_str_gbk(outbuf.c_str());
+    printf("gbk is_str_gbk Flag = %d\n", flag);
+    if(is_str_gbk(outbuf.c_str()))
     {
-        printf("error!");
-        return -1;
+        printf("--------\n");
+        outbuf = gbk2utf8(outbuf);  //utf8
+        printf("--- outbuf = %s\n", outbuf.c_str());
     }
-
-    auto outbuf2 = utf82gbk(outbuf); //gbk
-    printf("--- outbuf2 = %s\n", outbuf2.c_str());
-
-    if(outbuf2 == inbuf)
-        printf("--- SUCCESS ---");
+    else
+    {
+        printf("++++++++\n");
+        outbuf = utf82gbk(outbuf);  //gbk
+        printf("--- outbuf = %s\n", outbuf.c_str());
+    }
 
     return 0;
 }

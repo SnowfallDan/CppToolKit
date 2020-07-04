@@ -119,8 +119,51 @@ int utf8_to_gb(const char* src, char* dst, int len)
 }
 #endif
 
+int is_str_utf8(const char* str)
+{
+    int nBytes = 0;////UTF8可用1-6个字节编码,ASCII用一个字节
+    unsigned char ch = 0;
+    bool bAllAscii = true;//如果全部都是ASCII,说明不是UTF-8
+    for (unsigned int i = 0; str[i] != '\0'; ++i)
+    {
+        ch = *(str + i);
+        if ((ch & 0x80) != 0)
+            bAllAscii = false;
+        if(nBytes == 0)
+        {
+            if((ch & 0x80) != 0)
+            {
+                while((ch & 0x80) != 0)
+                {
+                    ch <<= 1;
+                    nBytes ++;
+                }
+                if((nBytes < 2) || (nBytes > 6))
+                {
+                    return 0;
+                }
+                nBytes --;
+            }
+        }
+        else
+        {
+            if((ch & 0xc0) != 0x80)
+            {
+                return 0;
+            }
+            nBytes --;
+        }
+        i ++;
+    }
+    if(bAllAscii)
+        return false;
+    return (nBytes == 0);
+}
+
 bool is_str_gbk(const char* str)
 {
+    if(is_str_utf8(str))
+        return false;
     unsigned int nBytes = 0;//GBK可用1-2个字节编码,中文两个 ,英文一个
     unsigned char chr = *str;
     bool bAllAscii = true; //如果全部都是ASCII,
