@@ -14,7 +14,7 @@ int main()
 
     flag = is_str_gbk(outbuf.c_str());
     printf("gbk is_str_gbk Flag = %d\n", flag);
-    if(is_str_gbk(outbuf.c_str()))
+    if(flag)
     {
         printf("--------\n");
         outbuf = gbk2utf8(outbuf);  //utf8
@@ -22,7 +22,6 @@ int main()
     }
     else
     {
-        printf("++++++++\n");
         outbuf = utf82gbk(outbuf);  //gbk
         printf("--- outbuf = %s\n", outbuf.c_str());
     }
