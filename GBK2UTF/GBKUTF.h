@@ -1,20 +1,6 @@
 #ifndef _UTF8_H
 #define _UTF8_H
 
-// example:
-// ==================================
-//    string inbuf = "adf ！@#￥%……&×（）——+～中文测试！ 1234567890\nabcdefghigklmnopqrstuvwxyz\rABCDEFGHIGKLMNOPQRSTUVWXYZ"; //gbk
-//    string outbuf;
-//    printf("--- inbuf = %s\n", inbuf.c_str());
-//    outbuf = gbk2utf8(inbuf);  //utf8
-//    printf("--- outbuf = %s\n", outbuf.c_str());
-//
-//    if(outbuf.empty())
-//    {
-//        printf("error!");
-//        return -1;
-//    }
-
 #include <iconv.h>
 #include <string>
 #include <stdio.h>
@@ -87,7 +73,7 @@ int gb_to_utf8(const char *src, char *dst, int len)
     return 0;
 }
 
-int utf8_to_gb(const char* src, char* dst, int len)
+int utf8_to_gb(const char *src, char *dst, int len)
 {
     int ret = 0;
     size_t inlen = strlen(src) + 1;
@@ -95,17 +81,19 @@ int utf8_to_gb(const char* src, char* dst, int len)
 
     // duanqn: The iconv function in Linux requires non-const char *
     // So we need to copy the source string
-    char* inbuf = (char *)malloc(len);
-    char* inbuf_hold = inbuf;   // iconv may change the address of inbuf
+    char *inbuf = (char *) malloc(len);
+    char *inbuf_hold = inbuf;   // iconv may change the address of inbuf
     // so we use another pointer to keep the address
     memcpy(inbuf, src, len);
 
-    char* outbuf = dst;
+    char *outbuf = dst;
     iconv_t cd;
     cd = iconv_open("GBK", "UTF-8");
-    if (cd != (iconv_t)-1) {
+    if (cd != (iconv_t) -1)
+    {
         ret = iconv(cd, &inbuf, &inlen, &outbuf, &outlen);
-        if (ret != 0) {
+        if (ret != 0)
+        {
             printf("iconv failed err: %s\n", strerror(errno));
             return -1;
         }
@@ -119,99 +107,103 @@ int utf8_to_gb(const char* src, char* dst, int len)
 }
 #endif
 
-int is_str_utf8(const char* str)
+unsigned char utf8_look_for_table[] =
+        {
+                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+                2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+                3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+                4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 1, 1
+        };
+#define UTFLEN(x) utf8_look_for_table[(x)]
+//根据首字节,获取utf8字符所占字节数
+inline int get_utf8_char_byte_num(unsigned char ch)
 {
-    int nBytes = 0;////UTF8可用1-6个字节编码,ASCII用一个字节
-    unsigned char ch = 0;
-    bool bAllAscii = true;//如果全部都是ASCII,说明不是UTF-8
-    for (unsigned int i = 0; str[i] != '\0'; ++i)
-    {
-        ch = *(str + i);
-        if ((ch & 0x80) != 0)
-            bAllAscii = false;
-        if(nBytes == 0)
-        {
-            if((ch & 0x80) != 0)
-            {
-                while((ch & 0x80) != 0)
-                {
-                    ch <<= 1;
-                    nBytes ++;
-                }
-                if((nBytes < 2) || (nBytes > 6))
-                {
-                    return 0;
-                }
-                nBytes --;
-            }
-        }
-        else
-        {
-            if((ch & 0xc0) != 0x80)
-            {
-                return 0;
-            }
-            nBytes --;
-        }
-        i ++;
-    }
-    if(bAllAscii)
-        return false;
-    return (nBytes == 0);
+    int byteNum = 0;
+    if (ch >= 0xFC && ch < 0xFE)
+        byteNum = 6;
+    else if (ch >= 0xF8)
+        byteNum = 5;
+    else if (ch >= 0xF0)
+        byteNum = 4;
+    else if (ch >= 0xE0)
+        byteNum = 3;
+    else if (ch >= 0xC0)
+        byteNum = 2;
+    else if (0 == (ch & 0x80))
+        byteNum = 1;
+    return byteNum;
 }
 
-bool is_str_gbk(const char* str)
+//判断字符串是否是utf8格式
+int is_str_utf8(const char *str)
 {
-    if(is_str_utf8(str))
-        return false;
-    unsigned int nBytes = 0;//GBK可用1-2个字节编码,中文两个 ,英文一个
-    unsigned char chr = *str;
-    bool bAllAscii = true; //如果全部都是ASCII,
-    for (unsigned int i = 0; str[i] != '\0'; ++i){
-        chr = *(str + i);
-        if ((chr & 0x80) != 0 && nBytes == 0){// 判断是否ASCII编码,如果不是,说明有可能是GBK
-            bAllAscii = false;
+    int byteNum = 0;
+    unsigned char ch;
+    const char *ptr = str;
+    if (NULL == str)
+        return 0;
+
+    while (*ptr != '\0')
+    {
+        ch = (unsigned char) *ptr;
+        if (byteNum == 0) //根据首字节特性判断该字符的字节数
+        {
+            if (0 == (byteNum = get_utf8_char_byte_num(ch)))
+                return 0;
         }
-        if (nBytes == 0) {
-            if (chr >= 0x80) {
-                if (chr >= 0x81 && chr <= 0xFE){
-                    nBytes = +2;
-                }
-                else{
-                    return false;
-                }
-                nBytes--;
-            }
+        else //多字节字符,非首字节格式:10xxxxxx
+        {
+            if ((ch & 0xC0) != 0x80)
+                return 0;
         }
-        else{
-            if (chr < 0x40 || chr>0xFE){
-                return false;
-            }
-            nBytes--;
-        }//else end
+
+        byteNum--;
+        ptr++;
     }
-    if (nBytes != 0) {   //违返规则
+    if (byteNum > 0)
+        return 0;
+    return 1;
+}
+
+bool is_str_gbk(const string &strIn)
+{
+    if(is_str_utf8(strIn.c_str()))
         return false;
+    unsigned char ch1;
+    unsigned char ch2;
+
+    if (strIn.size() >= 2)
+    {
+        ch1 = (unsigned char) strIn.at(0);
+        ch2 = (unsigned char) strIn.at(1);
+        return ch1 >= 129 && ch1 <= 254 && ch2 >= 64 && ch2 <= 254;
     }
-    if (bAllAscii){ //如果全部都是ASCII, 也是GBK
-        return true;
-    }
-    return true;
+    else return false;
 }
 
 string gbk2utf8(const string &in)
 {
+    if(is_str_utf8(in.c_str()))
+        return in;
     string out;
-    // 不是gbk编码格式
-    if(!is_str_gbk(in.c_str()))
-        return out;
-
     size_t inlen = in.size();
     size_t outlen = inlen * 10;
 
-    auto outbuf = (char *)malloc(outlen);
+    auto outbuf = (char *) malloc(outlen);
     memset(outbuf, 0, outlen);
-    if(gb_to_utf8(in.c_str(), outbuf, outlen) == 0)
+    if (gb_to_utf8(in.c_str(), outbuf, outlen) == 0)
         out = std::string(outbuf);
 
     free(outbuf);
@@ -224,9 +216,9 @@ string utf82gbk(const string &in)
     size_t inlen = in.size();
     size_t outlen = inlen * 10;
 
-    auto outbuf = (char *)malloc(outlen);
+    auto outbuf = (char *) malloc(outlen);
     memset(outbuf, 0, outlen);
-    if(utf8_to_gb(in.c_str(), outbuf, outlen) == 0 && is_str_gbk(outbuf))
+    if(utf8_to_gb(in.c_str(), outbuf, outlen) == 0)
         out = std::string(outbuf);
 
     free(outbuf);
