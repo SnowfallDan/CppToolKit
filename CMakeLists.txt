@@ -22,9 +22,11 @@ elseif(MACOS)
 endif()
 include_directories("${PROJECT_BINARY_DIR}" "${PROJECT_SOURCE_DIR}/include")
 
-include_directories(Log)
-include_directories(MemoryPool)
-include_directories(EventPoller)
+include_directories(src/Log)
+include_directories(src/MemoryPool)
+include_directories(src/EventPoller)
+include_directories(src/MysqlConnPool)
+include_directories(src/Utils)
 
 add_subdirectory(example)
 

@@ -181,16 +181,24 @@ bool is_str_gbk(const string &strIn)
 {
     if(is_str_utf8(strIn.c_str()))
         return false;
-    unsigned char ch1;
-    unsigned char ch2;
 
-    if (strIn.size() >= 2)
+    if (strIn.size() < 2)
+        return false;
+
+    unsigned char ch1 = 0;
+    unsigned char ch2 = 0;
+    bool flag = false;
+    for (int i = 0; i < strIn.size(); ++i)
     {
-        ch1 = (unsigned char) strIn.at(0);
-        ch2 = (unsigned char) strIn.at(1);
-        return ch1 >= 129 && ch1 <= 254 && ch2 >= 64 && ch2 <= 254;
+        ch1 = (unsigned char) strIn.at(i);
+        ch2 = (unsigned char) strIn.at(i + 1);
+        if(ch1 >= 129 && ch1 <= 254 && ch2 >= 64 && ch2 <= 254)
+        {
+            flag = true;
+            break;
+        }
     }
-    else return false;
+    return flag;
 }
 
 string gbk2utf8(const string &in)
