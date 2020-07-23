@@ -7,49 +7,62 @@
 #include <mutex>
 
 #include "MysqlConnection.h"
+#include "ResourcePool.h"
 
 using std::string;
 using std::list;
 
+namespace toolkit
+{
+// Mysql数据库连接池, 基于工具类src/Utils/ResourcePool.h
 class MysqlConnPool : public noncopyable, public std::enable_shared_from_this<MysqlConnPool>
 {
 public:
     typedef std::shared_ptr<MysqlConnPool> Ptr;
+    typedef ResourcePool<MysqlConnection> PoolType;
 
-    static MysqlConnPool::Ptr get_instance(string url, string user_name, string password, uint max_conn_size = 10, uint inc_step = 10);
+    static MysqlConnPool::Ptr get_instance();
 
-    MysqlConnection::Ptr get_connection();
+    template<typename ...Args>
+    void init(Args &&...arg)
+    {
+        pool_.reset(new PoolType(std::forward<Args>(arg)...));
+        pool_->obtain();
+    }
 
-    void release_connection(const MysqlConnection::Ptr& conn);
-
-    void terminate();
-
-    uint get_current_size() const;
+    void set_pool_size(uint size);
 
     Driver *get_driver();
 
-    bool if_exceed_conn_limit();
+    int execute_sql(string sql);
+
+//    template<typename Fmt,typename ...Args>
+//    int execute_sql(Fmt &&fmt, Args && ...arg);
+
+    template<typename Fmt,typename ...Args>
+    ResultSetPtr query(Fmt &&fmt, Args && ...arg);
 
 private:
-    MysqlConnPool(string url, string user_name, string password, uint max_conn_size, uint inc_step);
+    MysqlConnPool();
+
+    void check_inited_();
+
+    template<typename ...Args>
+    static inline string query_string_(const char *fmt, Args &&...arg);
+
+    template<typename ...Args>
+    static inline string query_string_(const string &fmt, Args &&...args);
+
+    static inline const char *query_string_(const char *fmt);
+
+    static inline const string &query_string_(const string &fmt);
 
 private:
     static MysqlConnPool::Ptr instance_;
-
     Driver *driver_;
-
-    string conn_url_;
-    string user_name_;
-    string password_;
-    uint current_conn_size_;
-    uint inc_step_;
-    uint max_conn_size_;
-
-    list<MysqlConnection::Ptr> conn_list_;
-    std::mutex conn_list_mutex_;
-
-    bool if_exceed_conn_limit_ = false;
+    std::shared_ptr<PoolType> pool_;
 };
 
+}
 
 #endif //MYUTILS_SQLHELPER_H

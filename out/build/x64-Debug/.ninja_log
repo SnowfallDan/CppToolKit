@@ -1,9 +1,0 @@
-# ninja log v5
-1	2979	586681107	CMakeFiles/myUtils.dir/main.cpp.obj	201c3e21dbacfa34
-40	3216	586681107	Log/CMakeFiles/spd_log.dir/SpdlogInstance.cpp.obj	e0f2f8b931301706
-3217	4632	586681107	Log/spd_log.dll	9c689d9bd4be1e50
-3217	4632	586681107	Log/spd_log.lib	9c689d9bd4be1e50
-4	433	586681122	build.ninja	c64d5547fa1e624
-5	3387	586681126	Log/CMakeFiles/spd_log.dir/SpdlogInstance.cpp.obj	92d82fc660ad27fb
-3387	3872	586681126	Log/spd_log.lib	ecd12b5d54c1ddbf
-3872	5555	586681128	myUtils.exe	df9615b6afc0db94

@@ -1,86 +1,19 @@
 #include "MysqlConnPool.h"
 
+namespace toolkit
+{
 MysqlConnPool::Ptr MysqlConnPool::instance_ = nullptr;
 
-MysqlConnPool::Ptr MysqlConnPool::get_instance(string url, string user_name, string password, uint max_conn_size, uint inc_step)
+MysqlConnPool::Ptr
+MysqlConnPool::get_instance()
 {
     if (instance_.get() == nullptr)
-        instance_.reset(new MysqlConnPool(std::move(url), std::move(user_name), std::move(password), max_conn_size, inc_step));
+        instance_.reset(new MysqlConnPool());
     return instance_;
 }
 
-MysqlConnection::Ptr MysqlConnPool::get_connection()
-{
-    MysqlConnection::Ptr conn;
-    std::lock_guard<std::mutex> lock(conn_list_mutex_);
-    if (!conn_list_.empty())
-    {
-        printf("thread: %d, conn_list_ not empty\n", ::gettid());
-        conn = conn_list_.front();
-        conn_list_.pop_front();
-
-        if (conn->is_closed())
-            conn.reset(new MysqlConnection(shared_from_this(), conn_url_, user_name_, password_));
-    }
-    else
-    {
-        printf("thread: %d, conn_list_  empty\n", ::gettid());
-        for (int i = 0; i < inc_step_; ++i)
-        {
-            conn = std::make_shared<MysqlConnection>(shared_from_this(), conn_url_, user_name_, password_);
-            conn_list_.push_back(conn);
-        }
-        conn = std::make_shared<MysqlConnection>(shared_from_this(), conn_url_, user_name_, password_);
-    }
-
-    if ( ++current_conn_size_ > max_conn_size_ && !if_exceed_conn_limit_)
-        if_exceed_conn_limit_ = true;
-
-    printf("thread: %d, get conn\n", ::gettid());
-    return conn;
-}
-
-void MysqlConnPool::release_connection(const MysqlConnection::Ptr &conn)
-{
-    if (conn)
-    {
-        std::lock_guard<std::mutex> lock(conn_list_mutex_);
-        current_conn_size_--;
-        printf("thread: %d, release_connection\n", ::gettid());
-        if (current_conn_size_ < max_conn_size_)
-            conn_list_.push_back(conn);
-
-        if(if_exceed_conn_limit_ && current_conn_size_ == max_conn_size_)
-            if_exceed_conn_limit_ = false;
-    }
-    printf("thread: %d, release_connection end\n", ::gettid());
-}
-
-void MysqlConnPool::terminate()
-{
-    std::lock_guard<std::mutex> lock(conn_list_mutex_);
-    for (auto &it : conn_list_)
-    {
-        it->close();
-    }
-    conn_list_.clear();
-    current_conn_size_ = 0;
-}
-
-uint MysqlConnPool::get_current_size() const
-{
-    return current_conn_size_;
-}
-
 // private
-MysqlConnPool::MysqlConnPool(string url, string user_name, string password, uint max_conn_size, uint inc_step)
-        : conn_url_(std::move(url)),
-          user_name_(std::move(user_name)),
-          password_(std::move(password)),
-          current_conn_size_(0),
-          inc_step_(inc_step),
-          max_conn_size_(max_conn_size),
-          conn_list_()
+MysqlConnPool::MysqlConnPool()
 {
     try
     {
@@ -93,12 +26,118 @@ MysqlConnPool::MysqlConnPool(string url, string user_name, string password, uint
     }
 }
 
+//template<typename... Args>
+//void MysqlConnPool::init(Args &&... arg)
+//{
+//    pool_.reset(new PoolType(std::forward<Args>(arg)...));
+//    pool_->obtain();
+//}
+
 Driver *MysqlConnPool::get_driver()
 {
     return driver_;
 }
 
-bool MysqlConnPool::if_exceed_conn_limit()
+void MysqlConnPool::set_pool_size(uint size)
 {
-    return if_exceed_conn_limit_;
+    check_inited_();
+    pool_->set_pool_size(size);
+}
+
+void MysqlConnPool::check_inited_()
+{
+    if (!pool_)
+    {
+        throw;
+    }
+}
+
+int MysqlConnPool::execute_sql(string sql)
+{
+    typename PoolType::ResPtr conn;
+    try
+    {
+        check_inited_();
+        //捕获执行异常
+        conn = pool_->obtain();
+        return conn ? conn->create_statement_and_execute(sql) : -1;
+    }
+    catch (...)
+    {
+        conn->clean();
+        conn.quit();
+        throw;
+    }
+}
+
+//template<typename Fmt, typename... Args>
+//int MysqlConnPool::execute_sql(Fmt &&fmt, Args &&... arg)
+//{
+//    typename PoolType::ResPtr conn;
+//    try
+//    {
+//        check_inited_();
+//        //捕获执行异常
+//        conn = pool_->obtain();
+//        return conn ? conn->create_statement_and_execute(query_string_(std::forward<Fmt>(fmt), std::forward<Args>(arg)...)) : -1;
+//    }
+//    catch (...)
+//    {
+//        conn->clean();
+//        conn.quit();
+//        throw;
+//    }
+//}
+
+template<typename Fmt, typename... Args>
+ResultSetPtr MysqlConnPool::query(Fmt &&fmt, Args &&... arg)
+{
+    typename PoolType::ResPtr conn;
+    try
+    {
+        check_inited_();
+        //捕获执行异常
+        conn = pool_->obtain();
+        if (conn)
+            conn->prepare_statement_query(query_string_(std::forward<Fmt>(fmt), std::forward<Args>(arg)...));
+        return nullptr;
+    }
+    catch (...)
+    {
+        conn->clean();
+        conn.quit();
+        throw;
+    }
+}
+
+template<typename ...Args>
+string MysqlConnPool::query_string_(const char *fmt, Args &&...arg)
+{
+    char *ptr_out = nullptr;
+    asprintf(&ptr_out, fmt, arg...);
+    if (ptr_out)
+    {
+        string ret(ptr_out);
+        free(ptr_out);
+        return ret;
+    }
+    return "";
+}
+
+template<typename ...Args>
+string MysqlConnPool::query_string_(const string &fmt, Args &&...args)
+{
+    return queryString(fmt.data(), std::forward<Args>(args)...);
+}
+
+const char *MysqlConnPool::query_string_(const char *fmt)
+{
+    return fmt;
+}
+
+const string &MysqlConnPool::query_string_(const string &fmt)
+{
+    return fmt;
+}
+
 }
