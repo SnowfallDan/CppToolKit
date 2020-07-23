@@ -21,7 +21,7 @@ public:
     typedef std::shared_ptr<MysqlConnPool> Ptr;
     typedef ResourcePool<MysqlConnection> PoolType;
 
-    static MysqlConnPool::Ptr get_instance();
+    static Ptr get_instance();
 
     template<typename ...Args>
     void init(Args &&...arg)
@@ -34,10 +34,26 @@ public:
 
     Driver *get_driver();
 
-    int execute_sql(string sql);
+//    int execute_sql(string sql);
 
-//    template<typename Fmt,typename ...Args>
-//    int execute_sql(Fmt &&fmt, Args && ...arg);
+    template<typename Fmt,typename ...Args>
+    int execute_sql(Fmt &&fmt, Args && ...arg)
+    {
+        typename PoolType::ResPtr conn;
+        try
+        {
+            check_inited_();
+            //捕获执行异常
+            conn = pool_->obtain();
+            return conn ? conn->create_statement_and_execute(query_string_(std::forward<Fmt>(fmt), std::forward<Args>(arg)...)) : -1;
+        }
+        catch (...)
+        {
+            conn->clean();
+            conn.quit();
+            throw;
+        }
+    }
 
     template<typename Fmt,typename ...Args>
     ResultSetPtr query(Fmt &&fmt, Args && ...arg);
@@ -48,17 +64,37 @@ private:
     void check_inited_();
 
     template<typename ...Args>
-    static inline string query_string_(const char *fmt, Args &&...arg);
+    static inline string query_string_(const char *fmt, Args &&...arg)
+    {
+        char *ptr_out = nullptr;
+        asprintf(&ptr_out, fmt, arg...);
+        if (ptr_out)
+        {
+            string ret(ptr_out);
+            free(ptr_out);
+            return ret;
+        }
+        return "";
+    }
 
     template<typename ...Args>
-    static inline string query_string_(const string &fmt, Args &&...args);
+    static inline string query_string_(const string &fmt, Args &&...args)
+    {
+        return queryString(fmt.data(), std::forward<Args>(args)...);
+    }
 
-    static inline const char *query_string_(const char *fmt);
+    static inline const char *query_string_(const char *fmt)
+    {
+        return fmt;
+    }
 
-    static inline const string &query_string_(const string &fmt);
+    static inline const string &query_string_(const string &fmt)
+    {
+        return fmt;
+    }
 
 private:
-    static MysqlConnPool::Ptr instance_;
+    static Ptr instance_;
     Driver *driver_;
     std::shared_ptr<PoolType> pool_;
 };

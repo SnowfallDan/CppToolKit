@@ -52,23 +52,23 @@ void MysqlConnPool::check_inited_()
     }
 }
 
-int MysqlConnPool::execute_sql(string sql)
-{
-    typename PoolType::ResPtr conn;
-    try
-    {
-        check_inited_();
-        //捕获执行异常
-        conn = pool_->obtain();
-        return conn ? conn->create_statement_and_execute(sql) : -1;
-    }
-    catch (...)
-    {
-        conn->clean();
-        conn.quit();
-        throw;
-    }
-}
+//int MysqlConnPool::execute_sql(string sql)
+//{
+//    typename PoolType::ResPtr conn;
+//    try
+//    {
+//        check_inited_();
+//        //捕获执行异常
+//        conn = pool_->obtain();
+//        return conn ? conn->create_statement_and_execute(sql) : -1;
+//    }
+//    catch (...)
+//    {
+//        conn->clean();
+//        conn.quit();
+//        throw;
+//    }
+//}
 
 //template<typename Fmt, typename... Args>
 //int MysqlConnPool::execute_sql(Fmt &&fmt, Args &&... arg)
@@ -108,36 +108,6 @@ ResultSetPtr MysqlConnPool::query(Fmt &&fmt, Args &&... arg)
         conn.quit();
         throw;
     }
-}
-
-template<typename ...Args>
-string MysqlConnPool::query_string_(const char *fmt, Args &&...arg)
-{
-    char *ptr_out = nullptr;
-    asprintf(&ptr_out, fmt, arg...);
-    if (ptr_out)
-    {
-        string ret(ptr_out);
-        free(ptr_out);
-        return ret;
-    }
-    return "";
-}
-
-template<typename ...Args>
-string MysqlConnPool::query_string_(const string &fmt, Args &&...args)
-{
-    return queryString(fmt.data(), std::forward<Args>(args)...);
-}
-
-const char *MysqlConnPool::query_string_(const char *fmt)
-{
-    return fmt;
-}
-
-const string &MysqlConnPool::query_string_(const string &fmt)
-{
-    return fmt;
 }
 
 }
