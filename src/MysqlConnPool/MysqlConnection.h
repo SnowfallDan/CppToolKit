@@ -58,9 +58,9 @@ public:
 
     bool reconnect();
 
-    int create_statement_and_execute(const string &sql);
+    int execute(const string &sql);
 
-    int prepare_statement_query(const string &sql);
+    int query(const string &sql);
 
     ResultSetPtr& get_result_set();
 

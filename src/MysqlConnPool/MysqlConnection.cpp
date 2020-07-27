@@ -103,11 +103,11 @@ void MysqlConnection::clean()
     sql_.clear();
 }
 
-int MysqlConnection::create_statement_and_execute(const string &sql)
+int MysqlConnection::execute(const string &sql)
 {
+    clean();
     sql_ = sql;
     int ec = 0;
-    clean();
     try
     {
         check();
@@ -126,17 +126,17 @@ int MysqlConnection::create_statement_and_execute(const string &sql)
     }
 }
 
-int MysqlConnection::prepare_statement_query(const string &sql)
+int MysqlConnection::query(const string &sql)
 {
+    clean();
     sql_ = sql;
     int ec = 0;
-    clean();
     try
     {
         check();
-        pstmt_.reset(conn_->prepareStatement(sql_));
-        if (pstmt_ != nullptr)
-            res_.reset(pstmt_->executeQuery(sql_));
+        stmt_.reset(conn_->createStatement());
+        if (stmt_ != nullptr)
+            res_.reset(stmt_->executeQuery(sql_));
         return ec;
     }
     catch (sql::SQLException &e)

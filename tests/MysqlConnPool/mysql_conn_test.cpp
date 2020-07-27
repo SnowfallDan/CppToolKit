@@ -4,14 +4,14 @@
 using namespace toolkit;
 using namespace std;
 
-#define SIZE 30
+#define SIZE 2
 
 void func_insert(int n)
 {
-//    auto begin = getCurrentMillisecond();
-//    toolkit::MysqlConnPool::get_instance()->execute_sql("INSERT INTO test(id, label) VALUES (%d, '%s')", n, std::to_string(n).c_str());
-//    auto end = getCurrentMillisecond();
-//    cout << "[thread " << n  << "] insert cost: " << end - begin << "ms" << endl;
+    auto begin = getCurrentMillisecond();
+    toolkit::MysqlConnPool::get_instance()->execute_sql("INSERT INTO test(id, label) VALUES (%d, '%s')", n, std::to_string(n).c_str());
+    auto end = getCurrentMillisecond();
+    cout << "[thread " << n  << "] insert cost: " << end - begin << "ms" << endl;
 }
 
 void func_select(int n)
@@ -27,7 +27,7 @@ void func_select(int n)
         cout << ", label = '" << res->getString("label") << "'" << endl;
     }
     auto end = getCurrentMillisecond();
-    cout << "[thread " << n  << "] insert cost: " << end - begin << "ms" << endl;
+    cout << "[thread " << n  << "] select cost: " << end - begin << "ms" << endl;
 }
 
 int main()
@@ -39,8 +39,8 @@ int main()
         toolkit::MysqlConnPool::get_instance()->init(conn_pool, "tcp://172.30.46.40:4000", "iceberg", "iceberg", "iceberg123");
         toolkit::MysqlConnPool::get_instance()->set_pool_size(thread::hardware_concurrency() * 10);
 
-//        toolkit::MysqlConnPool::get_instance()->execute_sql("DROP TABLE IF EXISTS test");
-//        toolkit::MysqlConnPool::get_instance()->execute_sql("CREATE TABLE test(id INT, label CHAR(10))");
+        toolkit::MysqlConnPool::get_instance()->execute_sql("DROP TABLE IF EXISTS test");
+        toolkit::MysqlConnPool::get_instance()->execute_sql("CREATE TABLE test(id INT, label CHAR(10))");
 
         std::thread thread_pool[SIZE];
         int i = 0;
@@ -50,7 +50,8 @@ int main()
         for (auto & thread : thread_pool)
             thread.join();
 
-        sleep(1);
+        getchar();
+
         i = 0;
         for (auto & thread : thread_pool)
             thread = std::thread(&func_select, ++i);
@@ -80,7 +81,7 @@ int main()
     }
     catch (...)
     {
-
+        cout << "# ERR: Unknow Exception!" << endl;
     }
 
     return 0;

@@ -40,9 +40,7 @@ void MysqlConnPool::set_pool_size(uint size)
 void MysqlConnPool::check_inited_()
 {
     if (!pool_)
-    {
         throw;
-    }
 }
 
 }

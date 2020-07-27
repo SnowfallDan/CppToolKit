@@ -71,7 +71,7 @@ public:
             check_inited_();
             //捕获执行异常
             conn = pool_->obtain();
-            return conn ? conn->create_statement_and_execute(query_string_(std::forward<Fmt>(fmt), std::forward<Args>(arg)...)) : -1;
+            return conn ? conn->execute(query_string_(std::forward<Fmt>(fmt), std::forward<Args>(arg)...)) : -1;
         }
         catch (...)
         {
@@ -100,8 +100,8 @@ public:
             //捕获执行异常
             conn = pool_->obtain();
             if (conn)
-                conn->prepare_statement_query(query_string_(std::forward<Fmt>(fmt), std::forward<Args>(arg)...));
-            return nullptr;
+                conn->query(query_string_(std::forward<Fmt>(fmt), std::forward<Args>(arg)...));
+            return conn->get_result_set();
         }
         catch (...)
         {
