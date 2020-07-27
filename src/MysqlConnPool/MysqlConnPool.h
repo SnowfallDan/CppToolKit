@@ -30,9 +30,19 @@ public:
         pool_->obtain();
     }
 
+    SharedPtrRes<MysqlConnection> get_conn()
+    {
+        return pool_->obtain();
+    }
+
     void set_pool_size(uint size);
 
     Driver *get_driver();
+
+    void set_throw_ex_flag(bool flag)
+    {
+        throw_able_ = flag;
+    }
 
 //    int execute_sql(string sql);
 
@@ -51,12 +61,34 @@ public:
         {
             conn->clean();
             conn.quit();
-            throw;
+            if(throw_able_)
+                throw;
+            return -1;
         }
     }
 
     template<typename Fmt,typename ...Args>
-    ResultSetPtr query(Fmt &&fmt, Args && ...arg);
+    ResultSetPtr query(Fmt &&fmt, Args && ...arg)
+    {
+        typename PoolType::ResPtr conn;
+        try
+        {
+            check_inited_();
+            //捕获执行异常
+            conn = pool_->obtain();
+            if (conn)
+                conn->prepare_statement_query(query_string_(std::forward<Fmt>(fmt), std::forward<Args>(arg)...));
+            return nullptr;
+        }
+        catch (...)
+        {
+            conn->clean();
+            conn.quit();
+            if(throw_able_)
+                throw;
+            return nullptr;
+        }
+    }
 
 private:
     MysqlConnPool();
@@ -97,6 +129,7 @@ private:
     static Ptr instance_;
     Driver *driver_;
     std::shared_ptr<PoolType> pool_;
+    bool throw_able_ = false;
 };
 
 }

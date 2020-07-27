@@ -61,7 +61,6 @@ public:
         {
             return new T();
         };
-        printf("ResourcePoolImpl Constructed!\n");
     }
 
     template<typename ...ArgTypes>
@@ -71,7 +70,6 @@ public:
         {
             return new T(args...);
         };
-        printf("ResourcePoolImpl ArgTypes Constructed!\n");
     }
 
     ~ResourcePoolImpl()

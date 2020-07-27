@@ -99,8 +99,6 @@ bool MysqlConnection::reconnect()
 
 void MysqlConnection::clean()
 {
-    stmt_.reset();
-    pstmt_.reset();
     res_.reset();
     sql_.clear();
 }
@@ -138,7 +136,7 @@ int MysqlConnection::prepare_statement_query(const string &sql)
         check();
         pstmt_.reset(conn_->prepareStatement(sql_));
         if (pstmt_ != nullptr)
-            res_.reset(stmt_->executeQuery(sql_));
+            res_.reset(pstmt_->executeQuery(sql_));
         return ec;
     }
     catch (sql::SQLException &e)
