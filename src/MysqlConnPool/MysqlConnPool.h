@@ -23,6 +23,11 @@ public:
 
     static Ptr get_instance();
 
+    /**
+     * 初始化循环池，设置数据库连接参数
+     * @tparam Args
+     * @param arg
+     */
     template<typename ...Args>
     void init(Args &&...arg)
     {
@@ -35,6 +40,10 @@ public:
         return pool_->obtain();
     }
 
+    /**
+     * 设置Mysql循环池对象个数
+     * @param size
+     */
     void set_pool_size(uint size);
 
     Driver *get_driver();
@@ -46,6 +55,13 @@ public:
 
 //    int execute_sql(string sql);
 
+    /**
+     * 同步执行sql
+     * @tparam Fmt
+     * @tparam Args
+     * @param fmt
+     * @param arg
+     */
     template<typename Fmt,typename ...Args>
     int execute_sql(Fmt &&fmt, Args && ...arg)
     {
@@ -67,6 +83,13 @@ public:
         }
     }
 
+    /**
+     * 同步执行查询
+     * @tparam Fmt
+     * @tparam Args
+     * @param fmt
+     * @param arg
+     */
     template<typename Fmt,typename ...Args>
     ResultSetPtr query(Fmt &&fmt, Args && ...arg)
     {

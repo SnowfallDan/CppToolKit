@@ -28,7 +28,7 @@ include_directories(src/EventPoller)
 include_directories(src/MysqlConnPool)
 include_directories(src/Utils)
 
-add_subdirectory(example)
+add_subdirectory(tests)
 
 # Set RPATH
 if(WINDOWS)
