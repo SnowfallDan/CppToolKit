@@ -36,7 +36,7 @@ int main()
     {
         auto conn_pool = toolkit::MysqlConnPool::get_instance();
         // connection entry, db name, username, password
-        toolkit::MysqlConnPool::get_instance()->init(conn_pool, "tcp://172.30.46.40:4000", "iceberg", "iceberg", "iceberg123");
+        toolkit::MysqlConnPool::get_instance()->init("tcp://172.30.46.40:4000", "iceberg", "iceberg", "iceberg123");
         toolkit::MysqlConnPool::get_instance()->set_pool_size(thread::hardware_concurrency() * 10);
 
         toolkit::MysqlConnPool::get_instance()->execute_sql("DROP TABLE IF EXISTS test");
