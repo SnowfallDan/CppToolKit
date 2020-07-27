@@ -6,10 +6,10 @@ using namespace std;
 
 #define SIZE 2
 
-void func_insert(int n)
+void func_insert(int n, const char *ch)
 {
     auto begin = getCurrentMillisecond();
-    toolkit::MysqlConnPool::get_instance()->execute_sql("INSERT INTO test(id, label) VALUES (%d, '%s')", n, std::to_string(n).c_str());
+    toolkit::MysqlConnPool::get_instance()->execute_sql("INSERT INTO test(id, label) VALUES (%d, '%s')", n, ch);
     auto end = getCurrentMillisecond();
     cout << "[thread " << n  << "] insert cost: " << end - begin << "ms" << endl;
 }
@@ -45,7 +45,7 @@ int main()
         std::thread thread_pool[SIZE];
         int i = 0;
         for (auto & thread : thread_pool)
-            thread = std::thread(&func_insert, ++i);
+            thread = std::thread(&func_insert, ++i, std::to_string(i).c_str());
 
         for (auto & thread : thread_pool)
             thread.join();
