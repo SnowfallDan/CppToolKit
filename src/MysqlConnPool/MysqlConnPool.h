@@ -14,6 +14,10 @@ using std::list;
 
 namespace toolkit
 {
+#define MYSQL_CONNECTION_POOL toolkit::MysqlConnPool::get_instance()
+
+#define GET_MYSQL_CONNECTION() toolkit::MysqlConnPool::get_instance()->get_conn()
+
 // Mysql数据库连接池, 基于工具类src/Utils/ResourcePool.h
 class MysqlConnPool : public noncopyable, public std::enable_shared_from_this<MysqlConnPool>
 {
@@ -31,7 +35,7 @@ public:
     template<typename ...Args>
     void init(Args &&...arg)
     {
-        pool_.reset(new PoolType(std::forward<Args>(arg)...));
+        pool_.reset(new PoolType(shared_from_this(), std::forward<Args>(arg)...));
         pool_->obtain();
     }
 
@@ -52,8 +56,6 @@ public:
     {
         throw_able_ = flag;
     }
-
-//    int execute_sql(string sql);
 
     /**
      * 同步执行sql
@@ -116,37 +118,7 @@ public:
 private:
     MysqlConnPool();
 
-    void check_inited_();
-
-    template<typename ...Args>
-    static inline string query_string_(const char *fmt, Args &&...arg)
-    {
-        char *ptr_out = nullptr;
-        asprintf(&ptr_out, fmt, arg...);
-        if (ptr_out)
-        {
-            string ret(ptr_out);
-            free(ptr_out);
-            return ret;
-        }
-        return "";
-    }
-
-    template<typename ...Args>
-    static inline string query_string_(const string &fmt, Args &&...args)
-    {
-        return queryString(fmt.data(), std::forward<Args>(args)...);
-    }
-
-    static inline const char *query_string_(const char *fmt)
-    {
-        return fmt;
-    }
-
-    static inline const string &query_string_(const string &fmt)
-    {
-        return fmt;
-    }
+    bool check_inited_();
 
 private:
     static Ptr instance_;

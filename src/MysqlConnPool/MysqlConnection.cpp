@@ -67,6 +67,11 @@ bool MysqlConnection::is_closed()
     return conn_->isClosed();
 }
 
+void MysqlConnection::set_auto_commit(bool flag)
+{
+    if_auto_commit_ = flag;
+}
+
 bool MysqlConnection::is_valid()
 {
     return conn_->isValid();
@@ -97,12 +102,6 @@ bool MysqlConnection::reconnect()
     return conn_->reconnect();
 }
 
-void MysqlConnection::clean()
-{
-    res_.reset();
-    sql_.clear();
-}
-
 int MysqlConnection::execute(const string &sql)
 {
     clean();
@@ -110,6 +109,9 @@ int MysqlConnection::execute(const string &sql)
     int ec = 0;
     try
     {
+        if(!if_auto_commit_)
+            conn_->setAutoCommit(true);
+
         check();
         stmt_.reset(conn_->createStatement());
         if (stmt_ != nullptr)
@@ -133,6 +135,9 @@ int MysqlConnection::query(const string &sql)
     int ec = 0;
     try
     {
+        if(!if_auto_commit_)
+            conn_->setAutoCommit(true);
+
         check();
         stmt_.reset(conn_->createStatement());
         if (stmt_ != nullptr)
@@ -150,15 +155,62 @@ int MysqlConnection::query(const string &sql)
 
 }
 
+ResultSetPtr &MysqlConnection::get_result_set()
+{
+    return res_;
+}
+
+void MysqlConnection::prepare_transaction()
+{
+    if(if_auto_commit_)
+        set_auto_commit(false);
+}
+
+void MysqlConnection::add_transaction_sql(const string &sql)
+{
+    transaction_sql_vec_.push_back(sql);
+}
+
+bool MysqlConnection::execute_transaction(bool if_throw)
+{
+    int ec = 0;
+    try
+    {
+        for(auto &sql : transaction_sql_vec_)
+        {
+            pstmt_.reset(conn_->prepareStatement(sql));
+            pstmt_->executeUpdate();
+        }
+
+        conn_->commit();
+        return true;
+    }
+    catch (sql::SQLException &e)
+    {
+        conn_->rollback();
+        ec = e.getErrorCode();
+        std::cout << "execute(sql) ec=" << ec << ": " << e.what() << std::endl;
+        if (!conn_->isValid())
+            reconnect();
+
+        if(if_throw)
+            throw ;
+        else
+            return false;
+    }
+}
+
+void MysqlConnection::clean()
+{
+    res_.reset();
+    sql_.clear();
+    transaction_sql_vec_.clear();
+}
+
 void MysqlConnection::check()
 {
     if (!is_valid() && is_closed() && !conn_ && reconnect() && !conn_ && !is_valid() && is_closed())
         throw sql::SQLException("mysql lost connection!");
-}
-
-ResultSetPtr &MysqlConnection::get_result_set()
-{
-    return res_;
 }
 
 }

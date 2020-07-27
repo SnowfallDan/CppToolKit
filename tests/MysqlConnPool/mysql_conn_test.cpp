@@ -4,62 +4,58 @@
 using namespace toolkit;
 using namespace std;
 
-#define SIZE 2
-
-void func_insert(int n, const char *ch)
-{
-    auto begin = getCurrentMillisecond();
-    toolkit::MysqlConnPool::get_instance()->execute_sql("INSERT INTO test(id, label) VALUES (%d, '%s')", n, ch);
-    auto end = getCurrentMillisecond();
-    cout << "[thread " << n  << "] insert cost: " << end - begin << "ms" << endl;
-}
-
-void func_select(int n)
-{
-    auto begin = getCurrentMillisecond();
-    auto res = toolkit::MysqlConnPool::get_instance()->query("SELECT * FROM test WHERE id = %d", n);
-    while (res && res->next())
-    {
-        // You can use either numeric offsets...
-        cout << "id = " << res->getInt(1); // getInt(1) returns the first column
-        // ... or column names for accessing results.
-        // The latter is recommended.
-        cout << ", label = '" << res->getString("label") << "'" << endl;
-    }
-    auto end = getCurrentMillisecond();
-    cout << "[thread " << n  << "] select cost: " << end - begin << "ms" << endl;
-}
-
 int main()
 {
     try
     {
-        auto conn_pool = toolkit::MysqlConnPool::get_instance();
-        // connection entry, db name, username, password
-        toolkit::MysqlConnPool::get_instance()->init(conn_pool, "tcp://172.30.46.40:4000", "iceberg", "iceberg", "iceberg123");
-        toolkit::MysqlConnPool::get_instance()->set_pool_size(thread::hardware_concurrency() * 10);
+        // INIT MYSQL CONNECTION
+        MYSQL_CONNECTION_POOL->init("tcp://172.30.46.40:4000", "iceberg", "iceberg", "iceberg123");
+        // INIT POOL SIZE
+        MYSQL_CONNECTION_POOL->set_pool_size(thread::hardware_concurrency() * 10);
+        // EXECUTE DROP OR CREATE
+        MYSQL_CONNECTION_POOL->execute_sql("DROP TABLE IF EXISTS test");
+        MYSQL_CONNECTION_POOL->execute_sql("CREATE TABLE test(id INT, label CHAR(10))");
+        // INSERT
+        char value[1] = {'a'};
+        MYSQL_CONNECTION_POOL->execute_sql("INSERT INTO test(id, label) VALUES (%d, '%s')", 1, value);
+        //UPDATE
+        MYSQL_CONNECTION_POOL->execute_sql("UPDATE test SET label='b' WHERE id=%d", 1);
+        // SELECT
+        auto res = MYSQL_CONNECTION_POOL->query("SELECT * FROM test WHERE id = %d", 1);
+        while (res && res->next())
+        {
+            cout << "id = " << res->getInt(1); // getInt(1) returns the first column
+            cout << ", label = '" << res->getString("label") << "'" << endl;
+        }
 
-        toolkit::MysqlConnPool::get_instance()->execute_sql("DROP TABLE IF EXISTS test");
-        toolkit::MysqlConnPool::get_instance()->execute_sql("CREATE TABLE test(id INT, label CHAR(10))");
+        // TRANSACTION OK
+        auto conn = GET_MYSQL_CONNECTION();
+        conn->prepare_transaction();
+        char tran_ok[1] = {'z'};
+        conn->add_transaction_sql("INSERT INTO test(id, label) VALUES (%d, '%s')", 10, tran_ok);
+        conn->add_transaction_sql("UPDATE test SET label='y' WHERE id=%d", 10);
+        // not throw exception
+        if(conn->execute_transaction())
+        {
+            res = MYSQL_CONNECTION_POOL->query("SELECT * FROM test WHERE id = %d", 10);
+            while (res && res->next())
+            {
+                cout << "id = " << res->getInt(1);
+                cout << ", label = '" << res->getString("label") << "'" << endl;
+            }
+        }
+        else
+            cout << "Transaction Commit Error!" << endl;
 
-        std::thread thread_pool[SIZE];
-        int i = 0;
-        for (auto & thread : thread_pool)
-            thread = std::thread(&func_insert, ++i, std::to_string(i).c_str());
-
-        for (auto & thread : thread_pool)
-            thread.join();
-
-        getchar();
-
-        i = 0;
-        for (auto & thread : thread_pool)
-            thread = std::thread(&func_select, ++i);
-
-        for (auto & thread : thread_pool)
-            thread.join();
-
-        getchar();
+        // TRANSACTION ERROR
+        conn = GET_MYSQL_CONNECTION();
+        conn->prepare_transaction();
+        char tran_err[1] = {'t'};
+        conn->add_transaction_sql("INSERT INTO test(id, label) VALUES (%d, '%s')", 100, tran_err);
+        conn->add_transaction_sql("UPDATE test SET label='y' WHERE id=%d", 10000);
+        conn->add_transaction_sql("CREATE TABLE test(id INT, label CHAR(10))");
+        // throw exception
+        conn->execute_transaction(true);
     }
     catch (sql::SQLException &e)
     {

@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 #include <mysql_connection.h>
 #include <cppconn/driver.h>
@@ -13,6 +14,7 @@
 #include <cppconn/prepared_statement.h>
 
 #include "noncopyable.h"
+#include "StringUtils.h"
 
 using std::string;
 using sql::Connection;
@@ -20,6 +22,7 @@ using sql::Driver;
 using sql::Statement;
 using sql::PreparedStatement;
 using sql::ResultSet;
+using std::vector;
 
 namespace toolkit
 {
@@ -50,6 +53,8 @@ public:
 
     bool is_closed();
 
+    void set_auto_commit(bool flag);
+
     void close();
 
     bool is_valid();
@@ -63,6 +68,19 @@ public:
     int query(const string &sql);
 
     ResultSetPtr& get_result_set();
+
+    // transaction
+    void prepare_transaction();
+
+    void add_transaction_sql(const string &sql);
+
+    template<typename Fmt, typename... Args>
+    void add_transaction_sql(Fmt &&fmt, Args &&... arg)
+    {
+        transaction_sql_vec_.push_back(query_string_(std::forward<Fmt>(fmt), std::forward<Args>(arg)...));
+    }
+
+    bool execute_transaction(bool if_throw = false);
 
     void clean();
 
@@ -87,6 +105,9 @@ private:
     string password_;
 
     string sql_;
+    bool if_auto_commit_ = true;
+
+    vector<string> transaction_sql_vec_;
 };
 
 }

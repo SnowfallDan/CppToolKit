@@ -33,14 +33,21 @@ Driver *MysqlConnPool::get_driver()
 
 void MysqlConnPool::set_pool_size(uint size)
 {
-    check_inited_();
-    pool_->set_pool_size(size);
+    if(check_inited_())
+        pool_->set_pool_size(size);
 }
 
-void MysqlConnPool::check_inited_()
+bool MysqlConnPool::check_inited_()
 {
     if (!pool_)
-        throw;
+    {
+        if(throw_able_)
+            throw;
+        else
+            return false;
+    }
+
+    return true;
 }
 
 }
