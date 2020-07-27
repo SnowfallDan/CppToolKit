@@ -39,6 +39,9 @@ public:
         pool_->obtain();
     }
 
+    /**
+     * 获得一个Mysql Connection
+     */
     SharedPtrRes<MysqlConnection> get_conn()
     {
         return pool_->obtain();

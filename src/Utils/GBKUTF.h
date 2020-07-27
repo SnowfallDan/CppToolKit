@@ -127,6 +127,7 @@ unsigned char utf8_look_for_table[] =
                 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 1, 1
         };
 #define UTFLEN(x) utf8_look_for_table[(x)]
+
 //根据首字节,获取utf8字符所占字节数
 inline int get_utf8_char_byte_num(unsigned char ch)
 {
@@ -179,7 +180,7 @@ int is_str_utf8(const char *str)
 
 bool is_str_gbk(const string &strIn)
 {
-    if(is_str_utf8(strIn.c_str()))
+    if (is_str_utf8(strIn.c_str()))
         return false;
 
     if (strIn.size() < 2)
@@ -192,7 +193,7 @@ bool is_str_gbk(const string &strIn)
     {
         ch1 = (unsigned char) strIn.at(i);
         ch2 = (unsigned char) strIn.at(i + 1);
-        if(ch1 >= 129 && ch1 <= 254 && ch2 >= 64 && ch2 <= 254)
+        if (ch1 >= 129 && ch1 <= 254 && ch2 >= 64 && ch2 <= 254)
         {
             flag = true;
             break;
@@ -203,7 +204,7 @@ bool is_str_gbk(const string &strIn)
 
 string gbk2utf8(const string &in)
 {
-    if(is_str_utf8(in.c_str()))
+    if (is_str_utf8(in.c_str()))
         return in;
     string out;
     size_t inlen = in.size();
@@ -226,7 +227,7 @@ string utf82gbk(const string &in)
 
     auto outbuf = (char *) malloc(outlen);
     memset(outbuf, 0, outlen);
-    if(utf8_to_gb(in.c_str(), outbuf, outlen) == 0)
+    if (utf8_to_gb(in.c_str(), outbuf, outlen) == 0)
         out = std::string(outbuf);
 
     free(outbuf);

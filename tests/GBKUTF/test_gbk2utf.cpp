@@ -1,4 +1,4 @@
-#include "../../GBK2UTF/GBKUTF.h"
+#include "GBKUTF.h"
 
 int main()
 {
@@ -11,7 +11,7 @@ int main()
                    "<DeviceList Num=\"1\">\n"
                    "<Item>\n"
                    "<DeviceID>34020000001320000101</DeviceID>\n"
-                   "<Name>aÍ¨µÀaaÃû³ÆÍ¨µÀaÃû³ÆasdÍ¨µÀÃû³Æa</Name>\n"
+                   "<Name>aÍ¨ï¿½ï¿½aaï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½aï¿½ï¿½ï¿½ï¿½asdÍ¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½a</Name>\n"
                    "<Manufacturer>Hikvision</Manufacturer>\n"
                    "<Model>IP Camera</Model>\n"
                    "<Owner>Owner</Owner>\n"
@@ -39,15 +39,13 @@ int main()
 
     if(is_str_gbk(outbuf))
     {
-        printf("--------\n");
         outbuf = gbk2utf8(outbuf);  //utf8
-//        printf("--- outbuf = %s\n", outbuf.c_str());
+        printf("outbuf = %s\n", outbuf.c_str());
     }
     else
     {
-        printf("+++++++++\n");
         outbuf = utf82gbk(outbuf);  //gbk
-//        printf("--- outbuf = %s\n", outbuf.c_str());
+        printf("outbuf = %s\n", outbuf.c_str());
     }
 
     return 0;
