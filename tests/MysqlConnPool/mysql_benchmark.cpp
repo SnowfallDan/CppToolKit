@@ -8,16 +8,16 @@ using namespace std;
 
 void func_insert(int n, const char *ch)
 {
-    auto begin = getCurrentMillisecond();
-    toolkit::MysqlConnPool::get_instance()->execute_sql("INSERT INTO test(id, label) VALUES (%d, '%s')", n, ch);
-    auto end = getCurrentMillisecond();
+    auto begin = Time::getCurrentMillisecond();
+    MYSQL_CONNECTION_POOL->execute_sql("INSERT INTO test(id, label) VALUES (%d, '%s')", n, ch);
+    auto end = Time::getCurrentMillisecond();
     cout << "[thread " << n  << "] insert cost: " << end - begin << "ms" << endl;
 }
 
 void func_select(int n)
 {
-    auto begin = getCurrentMillisecond();
-    auto res = toolkit::MysqlConnPool::get_instance()->query("SELECT * FROM test WHERE id = %d", n);
+    auto begin = Time::getCurrentMillisecond();
+    auto res = MYSQL_CONNECTION_POOL->query("SELECT * FROM test WHERE id = %d", n);
     while (res && res->next())
     {
         // You can use either numeric offsets...
@@ -26,7 +26,7 @@ void func_select(int n)
         // The latter is recommended.
         cout << ", label = '" << res->getString("label") << "'" << endl;
     }
-    auto end = getCurrentMillisecond();
+    auto end = Time::getCurrentMillisecond();
     cout << "[thread " << n  << "] select cost: " << end - begin << "ms" << endl;
 }
 
@@ -34,13 +34,12 @@ int main()
 {
     try
     {
-        auto conn_pool = toolkit::MysqlConnPool::get_instance();
         // connection entry, db name, username, password
-        toolkit::MysqlConnPool::get_instance()->init("tcp://172.30.46.40:4000", "iceberg", "iceberg", "iceberg123");
-        toolkit::MysqlConnPool::get_instance()->set_pool_size(thread::hardware_concurrency() * 10);
+        MYSQL_CONNECTION_POOL->init("tcp://172.30.46.40:4000", "iceberg", "iceberg", "iceberg123");
+        MYSQL_CONNECTION_POOL->set_pool_size(thread::hardware_concurrency() * 10);
 
-        toolkit::MysqlConnPool::get_instance()->execute_sql("DROP TABLE IF EXISTS test");
-        toolkit::MysqlConnPool::get_instance()->execute_sql("CREATE TABLE test(id INT, label CHAR(10))");
+        MYSQL_CONNECTION_POOL->execute_sql("DROP TABLE IF EXISTS test");
+        MYSQL_CONNECTION_POOL->execute_sql("CREATE TABLE test(id INT, label CHAR(10))");
 
         std::thread thread_pool[SIZE];
         int i = 0;

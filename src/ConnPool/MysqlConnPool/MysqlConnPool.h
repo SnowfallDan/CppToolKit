@@ -12,11 +12,11 @@
 using std::string;
 using std::list;
 
+#define MYSQL_CONNECTION_POOL toolkit::MysqlConnPool::get_instance()
+#define GET_MYSQL_CONNECTION() toolkit::MysqlConnPool::get_instance()->get_conn()
+
 namespace toolkit
 {
-#define MYSQL_CONNECTION_POOL toolkit::MysqlConnPool::get_instance()
-
-#define GET_MYSQL_CONNECTION() toolkit::MysqlConnPool::get_instance()->get_conn()
 
 // Mysql数据库连接池, 基于工具类src/Utils/ResourcePool.h
 class MysqlConnPool : public noncopyable, public std::enable_shared_from_this<MysqlConnPool>
@@ -24,6 +24,8 @@ class MysqlConnPool : public noncopyable, public std::enable_shared_from_this<My
 public:
     typedef std::shared_ptr<MysqlConnPool> Ptr;
     typedef ResourcePool<MysqlConnection> PoolType;
+
+    DISABLE_COPY_AND_ASSIGN(MysqlConnPool);
 
     static Ptr get_instance();
 

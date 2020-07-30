@@ -15,6 +15,7 @@
 
 #include "noncopyable.h"
 #include "StringUtils.h"
+#include "DisableCopyAndAssign.h"
 
 using std::string;
 using sql::Connection;
@@ -47,6 +48,8 @@ public:
 
     ~MysqlConnection();
 
+    DISABLE_COPY_AND_ASSIGN(MysqlConnection);
+
     std::shared_ptr<MysqlConnPool> get_conn_pool();
 
     ConnectionPtr get_conn();
@@ -71,8 +74,6 @@ public:
 
     // transaction
     void prepare_transaction();
-
-    void add_transaction_sql(const string &sql);
 
     template<typename Fmt, typename... Args>
     void add_transaction_sql(Fmt &&fmt, Args &&... arg)

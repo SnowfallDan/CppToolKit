@@ -166,11 +166,6 @@ void MysqlConnection::prepare_transaction()
         set_auto_commit(false);
 }
 
-void MysqlConnection::add_transaction_sql(const string &sql)
-{
-    transaction_sql_vec_.push_back(sql);
-}
-
 bool MysqlConnection::execute_transaction(bool if_throw)
 {
     int ec = 0;
