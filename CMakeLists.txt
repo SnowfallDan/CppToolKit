@@ -1,25 +1,26 @@
 cmake_minimum_required(VERSION 3.14)
-project(myUtils)
+project(CppToolKits)
 set(CMAKE_CXX_STANDARD 14)
 
 MESSAGE( STATUS "PROJECT_NAME: " ${PROJECT_NAME} )
 
-if (CMAKE_HOST_WIN32)
-    set(WINDOWS 1)
-elseif(CMAKE_HOST_APPLE)
-    set(MACOS 1)
-elseif(CMAKE_HOST_UNIX)
-    set(LINUX 1)
+if(${CMAKE_BUILD_TYPE} MATCHES "Release")
+    set(BuildType "Release")
+    message(STATUS "Compile 'Release' Version")
+else()
+    set(BuildType "Debug")
+    message(STATUS "Compile 'Debug' Version")
 endif()
 
-# Add search path for include and lib files
-if(WINDOWS)
-    link_directories("${PROJECT_SOURCE_DIR}/platforms/win") 
-elseif(LINUX)
-    link_directories("${PROJECT_SOURCE_DIR}/platforms/linux") 
-elseif(MACOS)
-    link_directories("${PROJECT_SOURCE_DIR}/platforms/macos") 
-endif()
+set(RELEASE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/output)
+if (CMAKE_SYSTEM_NAME MATCHES "Linux")
+    SET(LIBRARY_OUTPUT_PATH ${RELEASE_DIR}/linux/${BuildType})
+    SET(EXECUTABLE_OUTPUT_PATH ${RELEASE_DIR}/linux/${BuildType})
+    add_compile_options(-fPIC)
+endif ()
+
+set(CppToolKits_Src ${CMAKE_CURRENT_SOURCE_DIR}/src)
+
 include_directories("${PROJECT_BINARY_DIR}" "${PROJECT_SOURCE_DIR}/include")
 
 include_directories(src/Log)
@@ -30,8 +31,3 @@ include_directories(src/Utils)
 include_directories(src/DataStructure)
 
 add_subdirectory(tests)
-
-# Set RPATH
-if(WINDOWS)
-INSTALL(TARGETS myUtils RUNTIME DESTINATION "${PROJECT_SOURCE_DIR}/out/")
-endif()

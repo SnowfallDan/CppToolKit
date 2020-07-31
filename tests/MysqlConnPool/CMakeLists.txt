@@ -1,9 +1,9 @@
-add_executable(mysql_conn_test mysql_conn_test.cpp
-        ../../src/ConnPool/MysqlConnPool/MysqlConnPool.cpp ../../src/ConnPool/MysqlConnPool/MysqlConnPool.h
-        ../../src/ConnPool/MysqlConnPool/MysqlConnection.cpp ../../src/ConnPool/MysqlConnPool/MysqlConnection.h)
-target_link_libraries(mysql_conn_test mysqlcppconn pthread)
+set(MysqlConnPool_src ${CppToolKits_Src}/Utils/ConnPool/MysqlConnPool)
+file(GLOB mysql_conn_list ${MysqlConnPool_src}/*.cpp ${MysqlConnPool_src}/*.h )
+add_library(mysqlconnpool STATIC ${mysql_conn_list})
 
-add_executable(mysql_benchmark mysql_benchmark.cpp
-        ../../src/ConnPool/MysqlConnPool/MysqlConnPool.cpp ../../src/ConnPool/MysqlConnPool/MysqlConnPool.h
-        ../../src/ConnPool/MysqlConnPool/MysqlConnection.cpp ../../src/ConnPool/MysqlConnPool/MysqlConnection.h)
-target_link_libraries(mysql_benchmark mysqlcppconn pthread)
+add_executable(mysql_conn_test mysql_conn_test.cpp)
+target_link_libraries(mysql_conn_test mysqlconnpool mysqlcppconn pthread)
+
+add_executable(mysql_benchmark mysql_benchmark.cpp)
+target_link_libraries(mysql_benchmark mysqlconnpool mysqlcppconn pthread)
