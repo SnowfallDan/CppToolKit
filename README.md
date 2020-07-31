@@ -4,12 +4,12 @@
 集合C++底层各种常用的数据结构，常用工具，日志，常用算法，多线程，常用设计模式和网络模块。为开发提供稳定可靠的工具库。
 
 ## CppTollKits特点
-- 基于C++11开发，，无任何其他依赖
+- 基于C++11开发，无任何其他依赖
 - 代码尽量清晰简洁，稳定可靠
 - 提供多样的工具，尽量满足日常需求使用
 ## CppToolKits内容
 ### 数据结构（DataStructure）
-- [ ] lru队列
+- [x] lru队列
 - [ ] BlockingQueue
 - [ ] BoundedBlockingQueue
 - [ ] LinkedHashMap
@@ -22,18 +22,18 @@
 - [ ] ...
 ### 常用工具（Utils）
 - [ ] DayTime工具
-- [ ] 大小端判断
-- [ ] gbk utf转换模块
+- [x] 大小端判断
+- [x] gbk utf转换模块
 - [ ] 常用字符串工具
-- [ ] uuid生成器
+- [x] uuid生成器
 - [ ] 分布式ID生成器
 - [ ] ssl工具类
 - [ ] Exception异常类
-- [ ] nocopyable和copyable
-- [ ] 禁用拷贝和赋值宏
+- [x] nocopyable
+- [x] 禁用拷贝和赋值宏
 - [ ] 配置文件工具(ini/yml/conf)
 - [ ] 文件File操作工具
-- [ ] Mysql数据库连接池
+- [x] Mysql数据库连接池
 - [ ] Redis数据库连接池
 - [ ] Reids分布式锁
 - [ ] 命令行工具
