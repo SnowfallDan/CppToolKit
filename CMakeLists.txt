@@ -58,5 +58,6 @@ include_directories(src/Net/EventPoller)
 include_directories(src/ConnPool/MysqlConnPool)
 include_directories(src/Utils)
 include_directories(src/DataStructure)
+include_directories(src/Thread)
 
 add_subdirectory(tests)
