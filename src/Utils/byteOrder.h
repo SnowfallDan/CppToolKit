@@ -1,5 +1,5 @@
-#ifndef MYUTILS_BYTEORDER_H
-#define MYUTILS_BYTEORDER_H
+#ifndef CPPTOOLKITS_BYTEORDER_H
+#define CPPTOOLKITS_BYTEORDER_H
 
 bool byteOrder()
 {
@@ -19,4 +19,4 @@ bool byteOrder()
 }
 
 
-#endif //MYUTILS_BYTEORDER_H
+#endif //CPPTOOLKITS_BYTEORDER_H

@@ -1,5 +1,5 @@
-#ifndef MYUTILS_STRINGUTILS_H
-#define MYUTILS_STRINGUTILS_H
+#ifndef CPPTOOLKITS_STRINGUTILS_H
+#define CPPTOOLKITS_STRINGUTILS_H
 
 #include <string>
 
@@ -35,4 +35,4 @@ static inline const string &query_string_(const string &fmt)
     return fmt;
 }
 
-#endif //MYUTILS_STRINGUTILS_H
+#endif //CPPTOOLKITS_STRINGUTILS_H

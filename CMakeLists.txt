@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.14)
+
 project(CppToolKits)
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 MESSAGE( STATUS "PROJECT_NAME: " ${PROJECT_NAME} )
 
@@ -18,6 +20,33 @@ if (CMAKE_SYSTEM_NAME MATCHES "Linux")
     SET(EXECUTABLE_OUTPUT_PATH ${RELEASE_DIR}/linux/${BuildType})
     add_compile_options(-fPIC)
 endif ()
+
+set(CMAKE_CXX_FLAGS "-g3 -std=c++11")
+
+option(ENABLE_TCMALLOC "Enable Google TCMalloc" false)
+option(ENABLE_JEMALLOC "Enable Facebook JeMalloc" true)
+
+#查找google-perftools
+find_package(TCMALLOC QUIET)
+if (ENABLE_TCMALLOC AND TCMALLOC_FOUND)
+    message(STATUS "found library:${TCMALLOC_LIBRARIES}, ENABLE_TCMALLOC defined")
+    include_directories(${TCMALLOC_INCLUDE_DIR})
+    add_definitions(-DENABLE_TCMALLOC)
+    list(APPEND LINK_LIB_LIST ${TCMALLOC_LIBRARIES})
+else()
+    message("-- TCMALLCO NOT FOUND!")
+endif ()
+
+#查找facebook-jemalloc
+find_package(JEMALLOC QUIET)
+if(ENABLE_TCMALLOC AND JEMALLOC_FOUND)
+    message(STATUS "found library:${JEMALLOC_LIBRARIES}, ENABLE_JEMALLOC defined")
+    add_definitions(-DENABLE_JEMALLOC)
+    include_directories(${JEMALLOC_INCLUDE_DIR})
+    list(APPEND LINK_LIB_LIST ${JEMALLOC_LIBRARIES})
+else()
+    message("-- JEMALLCO NOT FOUND!")
+endif()
 
 set(CppToolKits_Src ${CMAKE_CURRENT_SOURCE_DIR}/src)
 

@@ -1,5 +1,5 @@
-#ifndef MYUTILS_NONCOPYABLE_H
-#define MYUTILS_NONCOPYABLE_H
+#ifndef CPPTOOLKITS_NONCOPYABLE_H
+#define CPPTOOLKITS_NONCOPYABLE_H
 
 class noncopyable
 {
@@ -12,4 +12,4 @@ protected:
     ~noncopyable() = default;
 };
 
-#endif //MYUTILS_NONCOPYABLE_H
+#endif //CPPTOOLKITS_NONCOPYABLE_H

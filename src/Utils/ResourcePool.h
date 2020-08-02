@@ -1,5 +1,5 @@
-#ifndef MYUTILS_RESOURCEPOOL_H
-#define MYUTILS_RESOURCEPOOL_H
+#ifndef CPPTOOLKITS_RESOURCEPOOL_H
+#define CPPTOOLKITS_RESOURCEPOOL_H
 
 #include <atomic>
 #include <memory>
@@ -155,4 +155,4 @@ private:
 
 }
 
-#endif //MYUTILS_RESOURCEPOOL_H
+#endif //CPPTOOLKITS_RESOURCEPOOL_H

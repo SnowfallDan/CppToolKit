@@ -1,6 +1,7 @@
 #include <memory>
 
 #include "LRUQueue.h"
+#include "LRUQueueWithMutex.h"
 #include "TimeFunc.h"
 
 #define LRU_QUEUE_SIZE 100

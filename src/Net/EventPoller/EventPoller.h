@@ -1,5 +1,5 @@
-#ifndef MYUTILS_EVENTPOLL_H
-#define MYUTILS_EVENTPOLL_H
+#ifndef CPPTOOLKITS_EVENTPOLL_H
+#define CPPTOOLKITS_EVENTPOLL_H
 
 
 class EventPoller
@@ -13,4 +13,4 @@ class EventPoller
 };
 
 
-#endif //MYUTILS_EVENTPOLL_H
+#endif //CPPTOOLKITS_EVENTPOLL_H

@@ -1,5 +1,5 @@
-#ifndef MYUTILS_SQLHELPER_H
-#define MYUTILS_SQLHELPER_H
+#ifndef CPPTOOLKITS_SQLHELPER_H
+#define CPPTOOLKITS_SQLHELPER_H
 
 #include <string>
 #include <list>
@@ -134,4 +134,4 @@ private:
 
 }
 
-#endif //MYUTILS_SQLHELPER_H
+#endif //CPPTOOLKITS_SQLHELPER_H

@@ -1,5 +1,5 @@
-#ifndef MYUTILS_UUID_H
-#define MYUTILS_UUID_H
+#ifndef CPPTOOLKITS_UUID_H
+#define CPPTOOLKITS_UUID_H
 
 // sudo apt-get install uuid-dev
 
@@ -68,4 +68,4 @@ private:
     }
 };
 
-#endif //MYUTILS_UUID_H
+#endif //CPPTOOLKITS_UUID_H

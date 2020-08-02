@@ -1,5 +1,5 @@
-#ifndef MYUTILS_LRUQUEUE_H
-#define MYUTILS_LRUQUEUE_H
+#ifndef CPPTOOLKITS_LRUQUEUE_H
+#define CPPTOOLKITS_LRUQUEUE_H
 
 #include <string>
 #include <map>
@@ -214,7 +214,7 @@ public:
     ~LRUQueue() = default;
 
     template <class...Args>
-    void insert(const K &key, Args&&... args)
+    void put(const K &key, Args&&... args)
     {
         auto it = lru_map_.find(key);
         if (it != lru_map_.end())

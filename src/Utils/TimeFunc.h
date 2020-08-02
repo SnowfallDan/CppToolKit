@@ -1,5 +1,5 @@
-#ifndef MYUTILS_TIME_H
-#define MYUTILS_TIME_H
+#ifndef CPPTOOLKITS_TIME_H
+#define CPPTOOLKITS_TIME_H
 
 #include <unistd.h>
 #include <thread>
@@ -118,4 +118,4 @@ atomic<uint64_t> Time::s_currentMillisecond_{0};
 atomic<uint64_t> Time::s_currentMicrosecond_system_{getCurrentMicrosecondOrigin()};
 atomic<uint64_t> Time::s_currentMillisecond_system_{getCurrentMicrosecondOrigin() / 1000};
 
-#endif //MYUTILS_TIME_H
+#endif //CPPTOOLKITS_TIME_H
