@@ -18,7 +18,7 @@ int main()
     // LRU Insert 1M Times
     auto begin = Time::getCurrentMillisecond();
     for (int i = 0; i < INSERT_TIMES; ++i)
-        lru.insert(i, i);
+        lru.put(i, i);
     auto end = Time::getCurrentMillisecond();
     std::cout << "LRU insert 1M times cost: "<< end - begin << "ms" << std::endl;
     std::cout << "Each insert cost: "<< ((double)(end - begin) / (double)INSERT_TIMES) << "ms" << std::endl;

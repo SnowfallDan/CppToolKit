@@ -85,7 +85,7 @@ public:
         return s_currentMicrosecond_.load(std::memory_order_acquire);
     }
 
-    static string getTimeStr(const char *fmt, time_t time)
+    static std::string getTimeStr(const char *fmt, time_t time)
     {
         std::tm tm_snapshot{};
         if (!time)

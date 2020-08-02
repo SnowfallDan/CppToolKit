@@ -10,7 +10,7 @@
 ## CppToolKits内容
 ### 数据结构（DataStructure）
 - [x] lru队列
-- [ ] BlockingQueue
+- [x] BlockingQueue
 - [ ] BoundedBlockingQueue
 - [ ] LinkedHashMap
 - [ ] list_head封装类
