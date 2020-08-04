@@ -23,8 +23,8 @@ endif ()
 
 set(CMAKE_CXX_FLAGS "-g3 -std=c++11")
 
-option(ENABLE_TCMALLOC "Enable Google TCMalloc" false)
-option(ENABLE_JEMALLOC "Enable Facebook JeMalloc" true)
+option(ENABLE_TCMALLOC "Enable Google TCMalloc" true)
+option(ENABLE_JEMALLOC "Enable Facebook JeMalloc" false)
 
 #查找google-perftools
 find_package(TCMALLOC QUIET)

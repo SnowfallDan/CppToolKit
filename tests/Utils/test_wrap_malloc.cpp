@@ -1,5 +1,4 @@
-#include <stdlib.h>
-#include <jemalloc/jemalloc.h>
+#include "wrap_malloc.h"
 
 void
 do_something(size_t i)
@@ -10,13 +9,10 @@ do_something(size_t i)
 
 int main(int argc, char **argv)
 {
-    for (size_t i = 0; i < 1000; i++)
-    {
+    for (size_t i = 0; i < 10; i++)
         do_something(i);
-    }
 
-    // Dump allocator statistics to stderr.
-    malloc_stats_print(NULL, NULL, NULL);
+    dump_malloc_info();
 
     return 0;
 }
