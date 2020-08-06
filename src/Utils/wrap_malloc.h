@@ -1,17 +1,13 @@
 #ifndef CPPTOOLKITS_WRAP_MALLOC_H
 #define CPPTOOLKITS_WRAP_MALLOC_H
 
-#ifdef ENABLE_TCMALLOC
-#include <gperftools/tcmalloc.h>
-#else
 #include <stdlib.h>
-#endif
-
 #include <string>
 #include <map>
 #include <vector>
 #include <cstdint>
 
+#include "backtrace.h"
 #include "CurrentThread.h"
 
 using std::string;
@@ -25,7 +21,7 @@ struct original_malloc_ptr
 struct malloc_ptr_info
 {
     original_malloc_ptr *ori_ptr;
-    pid_t pid;
+    int tid;
     string backtrace;
 };
 
@@ -47,8 +43,8 @@ extern "C"
 
         malloc_ptr_info info{};
         info.ori_ptr = ori_ptr;
-        info.pid = CurrentThread::gettid();
-        info.backtrace = string("");
+        info.tid = CurrentThread::gettid();
+        Backtrace::DumpStackTraceToString(&(info.backtrace), 2);
         malloc_info_map[info.ori_ptr->ptr] = info;
 
         return info.ori_ptr->ptr;
@@ -83,12 +79,12 @@ extern "C"
     static inline void dump_malloc_info()
     {
         printf("------ Dump Not Free Malloced Info -------\n");
-        for (auto it = malloc_info_map.begin(); it != malloc_info_map.end(); ++it)
+        for (auto &it : malloc_info_map)
         {
-             printf("Address: %p\n", it->first);
-             printf("Size: %lu\n", it->second.ori_ptr->size);
-             printf("Pid: %u\n", it->second.pid);
-             printf("BackTrace: \n%s\n", it->second.backtrace.c_str());
+             printf("Address: %p\n", it.first);
+             printf("Size: %lu\n", it.second.ori_ptr->size);
+             printf("Thread: %u\n", it.second.tid);
+             printf("BackTrace: \n%s\n", it.second.backtrace.c_str());
              printf("----------------------------------\n");
         }
     }

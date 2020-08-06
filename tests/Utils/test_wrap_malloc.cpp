@@ -1,16 +1,45 @@
 #include "wrap_malloc.h"
 
-void
-do_something(size_t i)
-{
-    // Leak some memory.
-    malloc(i * 100);
-}
+#include <memory>
+#include <string>
+#include <vector>
+#include <stdio.h>
+#include <unistd.h>
+#include <thread>
+#include <functional>
 
-int main(int argc, char **argv)
+class Test
 {
-    for (size_t i = 0; i < 10; i++)
-        do_something(i);
+public:
+    explicit Test(int numThreads)
+    {
+        for (int i = 0; i < numThreads; ++i)
+            threads_.emplace_back(new std::thread(std::bind(&Test::threadFunc, this)));
+    }
+
+    void joinAll()
+    {
+        for (auto& thr : threads_)
+        {
+            thr->join();
+        }
+    }
+
+private:
+
+    void threadFunc()
+    {
+        // Leak some memory.
+        malloc(100);
+    }
+
+    std::vector<std::unique_ptr<std::thread>> threads_;
+};
+
+int main()
+{
+    Test t(1);
+    t.joinAll();
 
     dump_malloc_info();
 
