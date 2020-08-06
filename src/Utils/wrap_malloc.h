@@ -62,6 +62,7 @@ extern "C"
         if(it != malloc_info_map.end())
         {
              auto info = it->second;
+            malloc_info_map.erase(it);
             __real_free(info.ori_ptr);
         }
     }
@@ -78,6 +79,12 @@ extern "C"
 
     static inline void dump_malloc_info()
     {
+        if(malloc_info_map.empty())
+        {
+            printf("------ All Malloced Mem Free -------\n");
+            return;
+        }
+
         printf("------ Dump Not Free Malloced Info -------\n");
         for (auto &it : malloc_info_map)
         {

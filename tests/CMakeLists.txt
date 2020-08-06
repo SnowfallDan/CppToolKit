@@ -1,7 +1,6 @@
 add_subdirectory(MemoryPool)
 add_subdirectory(spdlog)
 add_subdirectory(Net/EventPoller)
-add_subdirectory(Utils/GBKUTF)
 add_subdirectory(Utils)
 add_subdirectory(MysqlConnPool)
 add_subdirectory(DataStructure)

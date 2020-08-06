@@ -1,6 +1,10 @@
 #include "ConnPool/MysqlConnPool/MysqlConnPool.h"
 #include "TimeFunc.h"
 
+#ifdef ENABLE_WRAP_MALLOC
+#include "wrap_malloc.h"
+#endif
+
 using namespace toolkit;
 using namespace std;
 

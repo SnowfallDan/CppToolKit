@@ -1850,7 +1850,6 @@ private:
         int depth = GetStackTrace(stack, ARRAYSIZE(stack), skip_count + 1);
         for (int i = 0; i < depth; i++)
         {
-#if defined(HAVE_SYMBOLIZE)
             if (FLAGS_symbolize_stacktrace)
             {
                 DumpPCAndSymbol(writerfn, arg, stack[i], std::to_string(i).c_str());
@@ -1859,9 +1858,6 @@ private:
             {
                 DumpPC(writerfn, arg, stack[i], "    ");
             }
-#else
-            DumpPC(writerfn, arg, stack[i], "    ");
-#endif
         }
     }
 

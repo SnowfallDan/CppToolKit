@@ -30,7 +30,8 @@ private:
     void threadFunc()
     {
         // Leak some memory.
-        malloc(100);
+        auto ptr = malloc(100);
+        free(ptr);
     }
 
     std::vector<std::unique_ptr<std::thread>> threads_;

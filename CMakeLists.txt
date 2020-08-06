@@ -23,19 +23,20 @@ endif ()
 
 set(CMAKE_CXX_FLAGS "-g3 -std=c++11")
 
-option(ENABLETCMALLOC "Enable Google TCMalloc" OFF)
-option(ENABLEJEMALLOC "Enable Facebook JeMalloc" OFF)
-option(ENABLEWRAPMALLOC "Enable Wrap Malloc" ON)
+option(ENABLE_TCMALLOC "Enable Google TCMalloc" OFF)
+option(ENABLE_JEMALLOC "Enable Facebook JeMalloc" OFF)
+option(ENABLE_WRAP_MALLOC "Enable Wrap Malloc" ON)
 
 #检查是否使用wrap malloc
-if(ENABLEWRAPMALLOC)
+if(ENABLE_WRAP_MALLOC)
     set(CMAKE_CXX_FLAGS "-Wl,--wrap,malloc -Wl,--wrap,free")
+    add_definitions(-DENABLE_WRAP_MALLOC)
     message(STATUS "Use Wrap Malloc")
 endif()
 
 #查找google-perftools
-find_package(TCMALLOC QUIET)
-if (ENABLEJEMALLOC AND TCMALLOC_FOUND)
+if (ENABLE_JEMALLOC)
+    find_package(TCMALLOC QUIET)
     message(STATUS "found library:${TCMALLOC_LIBRARIES}, ENABLE_TCMALLOC defined")
     include_directories(${TCMALLOC_INCLUDE_DIR})
     add_definitions(-DENABLE_TCMALLOC)
@@ -44,7 +45,7 @@ endif()
 
 #查找facebook-jemalloc
 find_package(JEMALLOC QUIET)
-if(ENABLETCMALLOC AND JEMALLOC_FOUND)
+if(ENABLE_TCMALLOC AND JEMALLOC_FOUND)
     message(STATUS "found library:${JEMALLOC_LIBRARIES}, ENABLE_JEMALLOC defined")
     add_definitions(-DENABLE_JEMALLOC)
     include_directories(${JEMALLOC_INCLUDE_DIR})
@@ -64,6 +65,5 @@ include_directories(src/Thread)
 
 list(APPEND LINK_LIB_LIST pthread)
 
-add_definitions(-DHAVE_SYMBOLIZE)
-
+add_subdirectory(src)
 add_subdirectory(tests)

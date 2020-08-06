@@ -1,6 +1,10 @@
 #include "ConnPool/MysqlConnPool/MysqlConnPool.h"
 #include "TimeFunc.h"
 
+#ifdef ENABLE_WRAP_MALLOC
+#include "wrap_malloc.h"
+#endif
+
 using namespace toolkit;
 using namespace std;
 
@@ -82,7 +86,9 @@ int main()
     {
         cout << "# ERR: Unknow Exception!" << endl;
     }
-
+#ifdef ENABLE_WRAP_MALLOC
+    dump_malloc_info();
+#endif
     return 0;
 }
 
