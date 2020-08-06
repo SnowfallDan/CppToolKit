@@ -35,7 +35,8 @@
 - [ ] 文件File操作工具
 - [x] Mysql数据库连接池
 - [ ] Redis数据库连接池
-- [ ] Reids分布式锁
+- [x] stacktrace工具
+- [x] wrap malloc工具
 - [ ] 命令行工具
 ### 多线程库
 - [ ] 信号量
