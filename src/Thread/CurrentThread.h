@@ -8,9 +8,9 @@ namespace CurrentThread
 {
     extern __thread int current_tid;
 
-    inline pid_t gettid()
+    inline int gettid()
     {
-        return static_cast<pid_t>(::syscall(SYS_gettid));
+        return static_cast<int>(::syscall(SYS_gettid));
     }
 
     inline void cache_tid()
