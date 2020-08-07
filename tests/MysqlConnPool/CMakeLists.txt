@@ -1,5 +1,5 @@
 add_executable(mysql_conn_test mysql_conn_test.cpp)
-target_link_libraries(mysql_conn_test mysqlconnpool mysqlcppconn pthread)
+target_link_libraries(mysql_conn_test cpptoolkits mysqlcppconn pthread)
 
 add_executable(mysql_benchmark mysql_benchmark.cpp)
-target_link_libraries(mysql_benchmark mysqlconnpool mysqlcppconn pthread)
+target_link_libraries(mysql_benchmark cpptoolkits mysqlcppconn pthread)

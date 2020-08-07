@@ -5,6 +5,7 @@
 #include <memory>
 #include <mutex>
 #include <deque>
+#include <functional>
 
 using namespace std;
 

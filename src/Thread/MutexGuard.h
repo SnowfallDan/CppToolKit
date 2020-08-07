@@ -21,6 +21,11 @@ public:
         lock_.unlock();
     }
 
+    pthread_mutex_t* get_mutex()
+    {
+        return lock_.get_mutex();
+    }
+
 private:
     Mutex &lock_;
 };

@@ -30,12 +30,12 @@ public:
     {
         auto ret = pthread_mutex_lock(&mutex_);
         assert(ret == 0);
-        mutex_holder_ = CurrentThread::gettid();
+        set_holder();
     }
 
     void unlock()
     {
-        mutex_holder_ = 0;
+        unset_holder();
         auto ret = pthread_mutex_unlock(&mutex_);
         assert(ret == 0);
     }
@@ -45,7 +45,7 @@ public:
         return pthread_mutex_trylock(&mutex_) == 0;
     }
 
-    pthread_mutex_t* mutex()
+    pthread_mutex_t* get_mutex()
     {
         return &mutex_;
     }
@@ -55,9 +55,19 @@ public:
         return mutex_holder_ == CurrentThread::which_tid();
     }
 
+    void unset_holder()
+    {
+        mutex_holder_ = 0;
+    }
+
+    void set_holder()
+    {
+        mutex_holder_ = CurrentThread::which_tid();
+    }
+
 private:
     pthread_mutex_t mutex_;
-    pid_t mutex_holder_;
+    int mutex_holder_;
 };
 
 #endif //CPPTOOLKITS_MUTEX_H

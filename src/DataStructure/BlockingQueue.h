@@ -2,8 +2,11 @@
 #define CPPTOOLKITS_BLOCKINGQUEUE_H
 
 #include <deque>
+#include <condition_variable>
 
 #include "noncopyable.h"
+#include "MutexGuard.h"
+#include "Condition.h"
 
 using std::deque;
 
@@ -11,20 +14,20 @@ template<typename T>
 class BlockingQueue : noncopyable
 {
 public:
-    BlockingQueue() : mutex_(), not_emptry_cond_(mutex_.mutex()), queue_() {}
+    BlockingQueue() : mutex_(), not_emptry_cond_(mutex_), queue_() {}
 
     void put(const T &one)
     {
         MutexLockGuard lock(mutex_);
         queue_.push_back(one);
-        not_emptry_cond_.notify_one();
+        not_emptry_cond_.notify();
     }
 
     void put(T&& one)
     {
         MutexLockGuard lock(mutex_);
         queue_.push_back(std::move(one));
-        not_emptry_cond_.notify_one();
+        not_emptry_cond_.notify();
     }
 
     T take()
@@ -44,8 +47,8 @@ public:
     }
 
 private:
-    mutable Mutex mutex_;
-    std::condition_variable not_emptry_cond_;
+    mutable std::mutex mutex_;
+    Condition not_emptry_cond_;
     deque<T> queue_;
 };
 
