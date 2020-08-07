@@ -3,20 +3,20 @@
 
 #include "Mutex.h"
 
-class MutexLockGuard
+class MutexGuard
 {
 public:
-    explicit MutexLockGuard(Mutex &lock) : lock_(lock)
+    explicit MutexGuard(Mutex &lock) : lock_(lock)
     {
         lock_.lock();
     }
 
-    explicit MutexLockGuard(Mutex *lock) : lock_(*lock)
+    explicit MutexGuard(Mutex *lock) : lock_(*lock)
     {
         lock_.lock();
     }
 
-    ~MutexLockGuard()
+    ~MutexGuard()
     {
         lock_.unlock();
     }
