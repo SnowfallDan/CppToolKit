@@ -14,8 +14,8 @@
 #include <cppconn/prepared_statement.h>
 
 #include "noncopyable.h"
-#include "StringUtils.h"
-#include "DisableCopyAndAssign.h"
+#include "stringUtils.h"
+#include "disableCopyAndAssign.h"
 
 using std::string;
 using sql::Connection;

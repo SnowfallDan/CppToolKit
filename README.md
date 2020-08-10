@@ -15,7 +15,7 @@
 - [ ] LinkedHashMap
 - [x] CountDownLatch
 - [ ] list_head封装类
-- [ ] 平衡二叉树
+- [x] 平衡二叉树
 - [ ] B树
 - [ ] B+树
 - [ ] 红黑树

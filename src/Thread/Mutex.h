@@ -6,7 +6,7 @@
 
 #include "CurrentThread.h"
 #include "noncopyable.h"
-#include "DisableCopyAndAssign.h"
+#include "disableCopyAndAssign.h"
 
 class Mutex : noncopyable
 {

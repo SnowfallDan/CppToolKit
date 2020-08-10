@@ -2,7 +2,7 @@
 
 #include "LRUQueue.h"
 #include "LRUQueueWithMutex.h"
-#include "TimeFunc.h"
+#include "timeFunc.h"
 
 #define LRU_QUEUE_SIZE 100
 typedef LRUQueue<int, int> LRU;

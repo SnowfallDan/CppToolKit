@@ -1,5 +1,5 @@
 #include "ConnPool/MysqlConnPool.h"
-#include "TimeFunc.h"
+#include "timeFunc.h"
 
 #ifdef ENABLE_WRAP_MALLOC
 #include "wrap_malloc.h"
