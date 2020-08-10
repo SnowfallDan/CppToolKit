@@ -31,7 +31,7 @@ Driver *MysqlConnPool::get_driver()
     return driver_;
 }
 
-void MysqlConnPool::set_pool_size(uint size)
+void MysqlConnPool::set_pool_size(unsigned int size)
 {
     if(check_inited_())
         pool_->set_pool_size(size);

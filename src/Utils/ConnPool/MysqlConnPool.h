@@ -53,7 +53,7 @@ public:
      * 设置Mysql循环池对象个数
      * @param size
      */
-    void set_pool_size(uint size);
+    void set_pool_size(unsigned int size);
 
     Driver *get_driver();
 
