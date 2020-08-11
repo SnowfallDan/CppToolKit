@@ -83,7 +83,7 @@ public:
         };
     }
 
-    void set_pool_size(uint size)
+    void set_pool_size(unsigned int size)
     {
         pool_size_ = size;
     }
@@ -119,7 +119,7 @@ private:
     std::function<T *(void)> t_functor_;
     list<T *> res_pool_;
     std::mutex pool_mutex_;
-    uint pool_size_ = 10;
+    unsigned int pool_size_ = 10;
 };
 
 // 循环资源池

@@ -209,7 +209,7 @@ public:
     // 禁用拷贝构造和等号运算符
     DISABLE_COPY_AND_ASSIGN(LRUQueue);
 
-    explicit LRUQueue(uint fixedCapacity = 1024) : fixed_capacity_(fixedCapacity) {}
+    explicit LRUQueue(unsigned int fixedCapacity = 1024) : fixed_capacity_(fixedCapacity) {}
 
     ~LRUQueue() = default;
 
@@ -242,7 +242,7 @@ public:
     }
 
 private:
-    uint fixed_capacity_;
+    unsigned int fixed_capacity_;
     std::unordered_map<K, Entry<K, V> *> lru_map_;
     List<K, V> lru_list_;
 };

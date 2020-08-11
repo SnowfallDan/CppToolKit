@@ -9,7 +9,7 @@ template<typename K, typename V>
 class LRUQueueWithMutex
 {
 public:
-    explicit LRUQueueWithMutex(uint fixedCapacity = 1024) : lru_(fixedCapacity) {}
+    explicit LRUQueueWithMutex(unsigned int fixedCapacity = 1024) : lru_(fixedCapacity) {}
 
     template <class...Args>
     void put(const K &key, Args&&... args)
